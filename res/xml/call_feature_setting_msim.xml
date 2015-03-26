@@ -20,6 +20,7 @@
     xmlns:phone="http://schemas.android.com/apk/res/com.android.phone"
     android:title="@string/updating_title">
 
+<<<<<<< HEAD
     <!-- target class is com.android.phone.MultiSimSetting -->
   <PreferenceScreen
       android:key="button_call_independent_serv"
@@ -30,6 +31,11 @@
           android:targetPackage="com.android.phone"
           android:targetClass="com.android.phone.SelectSubscription" />
   </PreferenceScreen>
+=======
+  <PreferenceCategory
+      android:key="sim_category_key"
+      android:title="@string/callind_multi_sim" />
+>>>>>>> cf435ac... Improve MSIM call settings.
 
   <PreferenceCategory
       android:key="button_misc_category_key"
