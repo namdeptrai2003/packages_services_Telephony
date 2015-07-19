@@ -459,7 +459,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="SelectSubscription"
+        <activity android:name=".msim.SelectSubscription"
             android:label="@string/callind_multi_sim"
             android:configChanges="orientation|keyboardHidden"
             android:permission="com.qti.permission.SELECT_SUBSCRIPTION"
