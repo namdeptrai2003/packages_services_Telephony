@@ -25,7 +25,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -100,6 +102,8 @@ public class CallFeaturesSetting extends PreferenceActivity
     private static final String BUTTON_RETRY_KEY       = "button_auto_retry_key";
     private static final String BUTTON_GSM_UMTS_OPTIONS = "button_gsm_more_expand_key";
     private static final String BUTTON_CDMA_OPTIONS = "button_cdma_more_expand_key";
+    private static final String IMS_SETTINGS_KEY      = "ims_settings_key";
+    private static final String QTI_IMS_PACKAGE_NAME = "com.qualcomm.qti.ims";
 
     private static final String PROX_AUTO_SPEAKER  = "prox_auto_speaker";
     private static final String PROX_AUTO_SPEAKER_DELAY  = "prox_auto_speaker_delay";
@@ -390,6 +394,12 @@ public class CallFeaturesSetting extends PreferenceActivity
             /* tm.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); */
         }
 
+        Preference imsSettings = findPreference(IMS_SETTINGS_KEY);
+
+        if (!isPackageInstalled(this, QTI_IMS_PACKAGE_NAME)) {
+            prefSet.removePreference(imsSettings);
+        }
+
         Preference wifiCallingSettings = findPreference(
                 getResources().getString(R.string.wifi_calling_settings_key));
 
@@ -436,6 +446,25 @@ public class CallFeaturesSetting extends PreferenceActivity
             mFlipAction.setValue(String.valueOf(flipAction));
             updateFlipActionSummary(flipAction);
         }
+    }
+
+    public static boolean isPackageInstalled(Context context, String pkg, boolean ignoreState) {
+        if (pkg != null) {
+            try {
+                PackageInfo pi = context.getPackageManager().getPackageInfo(pkg, 0);
+                if (!pi.applicationInfo.enabled && !ignoreState) {
+                    return false;
+                }
+            } catch (NameNotFoundException e) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean isPackageInstalled(Context context, String pkg) {
+        return isPackageInstalled(context, pkg, true);
     }
 
     @Override
