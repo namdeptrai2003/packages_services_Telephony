@@ -49,8 +49,6 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
     private static final String DEFAULT_OUTGOING_ACCOUNT_KEY = "default_outgoing_account";
     private static final String ALL_CALLING_ACCOUNTS_KEY = "phone_account_all_calling_accounts";
 
-    private static final String BUTTON_XDIVERT_KEY = "button_xdivert";
-
     private static final String INCALL_CATEGORY_KEY = "incall_screen_category_key";
     private static final String SHOW_SSN_PREF_KEY = "button_show_ssn_key";
 
@@ -172,15 +170,6 @@ public class PhoneAccountSettingsFragment extends PreferenceFragment
             }
         } else {
             getPreferenceScreen().removePreference(mAccountList);
-        }
-
-        if (TelephonyManager.getDefault().getMultiSimConfiguration() !=
-                 TelephonyManager.MultiSimVariants.DSDS) {
-            Preference mXDivertPref = getPreferenceScreen().findPreference(BUTTON_XDIVERT_KEY);
-            if (mXDivertPref != null) {
-                Log.d(LOG_TAG, "Remove xdivert preference: ");
-                getPreferenceScreen().removePreference(mXDivertPref);
-            }
         }
 
         if (SipUtil.isVoipSupported(getActivity())) {
