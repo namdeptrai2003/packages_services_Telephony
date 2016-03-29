@@ -487,6 +487,7 @@ public class NotificationMgr {
                                 VOICEMAIL_NOTIFICATION,
                                 notification,
                                 userHandle);
+                    }
                 }
             }
         } else {
