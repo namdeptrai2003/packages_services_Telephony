@@ -62,8 +62,6 @@ import java.util.regex.Pattern;
  * Service for making GSM and CDMA connections.
  */
 public class TelephonyConnectionService extends ConnectionService {
-    private static final int INVALID = -1;
-    private static final int PRIMARY_STACK_MODEMID = 0;
 
     // If configured, reject attempts to dial numbers matching this pattern.
     private static final Pattern CDMA_ACTIVATION_CODE_REGEX_PATTERN =
@@ -667,77 +665,39 @@ public class TelephonyConnectionService extends ConnectionService {
 
     private Phone getFirstPhoneForEmergencyCall() {
         Phone selectPhone = null;
-        final TelephonyManager tm = TelephonyManager.getDefault();
-        final SubscriptionController subscriptionController = SubscriptionController.getInstance();
-        for (int i = 0; i < tm.getSimCount(); i++) {
-            int[] subIds = subscriptionController.getSubIdUsingSlotId(i);
+        for (int i = 0; i < TelephonyManager.getDefault().getSimCount(); i++) {
+            int[] subIds = SubscriptionController.getInstance().getSubIdUsingSlotId(i);
             if (subIds.length == 0)
                 continue;
 
-            int phoneId = subscriptionController.getPhoneId(subIds[0]);
+            int phoneId = SubscriptionController.getInstance().getPhoneId(subIds[0]);
             Phone phone = PhoneFactory.getPhone(phoneId);
             if (phone == null)
                 continue;
 
-            if (ServiceState.STATE_IN_SERVICE == phone.getServiceState().getState() ||
-                    phone.getServiceState().isEmergencyOnly()) {
+            if (ServiceState.STATE_IN_SERVICE == phone.getServiceState().getState()) {
                 // the slot is radio on & state is in service
-                Log.i(this, "pickBestPhoneForEmergencyCall, " +
-                        "radio on & in service or in emergency mode, slotId:" + i);
+                Log.d(this, "pickBestPhoneForEmergencyCall, radio on & in service, slotId:" + i);
                 return phone;
             } else if (ServiceState.STATE_POWER_OFF != phone.getServiceState().getState()) {
-                // the slot is radio on & with SIM card inserted in a ready state,
-                // with an active sub
-                if (tm.hasIccCard(i) && tm.getSimState(i) == TelephonyManager.SIM_STATE_READY
-                        && subscriptionController.getSubState(subIds[i]) == SubscriptionManager.ACTIVE) {
-                    Log.i(this, "pickBestPhoneForEmergencyCall," +
-                            "radio on and SIM ready, slotId:" + i);
+                // the slot is radio on & with SIM card inserted.
+                if (TelephonyManager.getDefault().hasIccCard(i)) {
+                    Log.d(this, "pickBestPhoneForEmergencyCall," +
+                            "radio on and SIM card inserted, slotId:" + i);
+                    selectPhone = phone;
+                } else if (selectPhone == null) {
+                    Log.d(this, "pickBestPhoneForEmergencyCall, radio on, slotId:" + i);
                     selectPhone = phone;
                 }
             }
         }
 
         if (selectPhone == null) {
-            Log.i(this, "pickBestPhoneForEmergencyCall, return primary stack phone");
-            selectPhone = PhoneFactory.getPhone(getPrimaryStackPhoneId());
+            Log.d(this, "pickBestPhoneForEmergencyCall, return phone 0");
+            selectPhone = PhoneFactory.getPhone(0);
         }
 
         return selectPhone;
-    }
-
-    private int getPrimaryStackPhoneId() {
-        String modemUuId = null;
-        Phone phone = null;
-        int primayStackPhoneId = INVALID;
-
-        for (int i = 0; i < TelephonyManager.getDefault().getPhoneCount(); i++) {
-
-            phone = PhoneFactory.getPhone(i);
-            if (phone == null) continue;
-
-            Log.i(this, "Logical Modem id: " + phone.getModemUuId() + " phoneId: " + i);
-            modemUuId = phone.getModemUuId();
-            if ((modemUuId == null) || (modemUuId.length() <= 0) ||
-                    modemUuId.isEmpty()) {
-                continue;
-            }
-            // Select the phone id based on modemUuid
-            // if modemUuid is 0 for any phone instance, primary stack is mapped
-            // to it so return the phone id as the primary stack phone id.
-            if (Integer.parseInt(modemUuId) == PRIMARY_STACK_MODEMID) {
-                primayStackPhoneId = i;
-                Log.i(this, "Primay Stack phone id: " + primayStackPhoneId + " selected");
-                break;
-            }
-        }
-
-        // never return INVALID
-        if( primayStackPhoneId == INVALID){
-            Log.i(this, "Returning default phone id");
-            primayStackPhoneId = 0;
-        }
-
-        return primayStackPhoneId;
     }
 
     /**
