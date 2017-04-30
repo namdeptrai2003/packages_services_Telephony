@@ -364,7 +364,6 @@ public class CallFeaturesSetting extends PreferenceActivity
                 prefSet.removePreference(findPreference("button_callbarring_expand_key"));
         }
 
-        // Remove features if com.qualcomm.qti.ims app isn't found
         if (!PackageManagerUtils.isAppInstalled(this, "com.qualcomm.qti.ims")) {
             prefSet.removePreference(findPreference("ims_settings_key"));
         }
