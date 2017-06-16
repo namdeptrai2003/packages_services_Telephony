@@ -150,8 +150,11 @@
     <!-- Package name for the default in-call UI and dialer [DO NOT TRANSLATE] -->
     <string name="ui_default_package" translatable="false">com.android.dialer</string>
 
-    <!-- Class name for the default main Dialer activity [DO NOT TRANSLATE] -->
-    <string name="dialer_default_class" translatable="false">com.android.dialer.DialtactsActivity</string>
+<resources>
+    <string-array name="dialer_default_classes" translatable="false">
+        <item>com.android.dialer/com.android.dialer.DialtactsActivity</item>
+        <item>com.google.android.dialer/com.google.android.dialer.extensions.GoogleDialtactsActivity</string>
+</string-array>
 
     <!-- Package name for the network operator settings [DO NOT TRANSLATE] -->
     <string name="network_operator_settings_package" translatable="false">com.android.phone</string>
